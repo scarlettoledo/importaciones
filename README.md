@@ -7,7 +7,7 @@ Este sistema calcula el costo total de las importaciones utilizando datos de la 
 - **Postman**: Herramienta utilizada para realizar las peticiones HTTP a la API y probar el flujo de datos.
 - **Lenguaje de programación**:Python
 - **MySQL Workbench**: Base de datos utilizada para almacenar los datos relacionados con las importaciones, el valor del dólar y el resultado de los cálculos.
-- **Máquina Virtual**: Se utilizó la máquina virtual con Centos 8 para conectarse a la base de datos.
+- **Máquina Virtual**: Se utilizó VirtualBox con Centos 8 para conectarse a la base de datos.
 - **Impuestos**:
   - **Impuesto ad valorem**: Cálculo de impuesto de 6% sobre el valor del pedido
   - **IVA**: Cálculo del Impuesto al Valor Agregado (19%).
