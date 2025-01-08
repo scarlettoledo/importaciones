@@ -33,8 +33,32 @@ class ImportacionOperaciones ():
             print(f"Error al consultar API: {e}")
             return None
         
+    def obtener_id_usuario(username): #metodo para obtener el id usuario de la base de datos y almacenarlo en la tabla importaciones
+        connection = get_connection()
+        if connection is None:
+            return None
+        try: 
+            cursor = connection.cursor()
+            #Consulta para obtener el id_usuario
+            query = "SELECT id FROM usuarios WHERE username = %s"
+            cursor.execute(query, (username,))
+            result = cursor.fetchone()
+
+            if result:
+                return result[0]  #El id_usuario se encuentra en la primera columna
+            else:
+                return None        
+        
+        except Error as e:
+            print(f"Error al ejecutar la consulta: {e}")
+            return None
+        finally:
+            cursor.close() 
+            connection.close()
+            
+
     @staticmethod
-    def ingresar_importacion (importacion, usuario):
+    def ingresar_importacion (importacion, usuario, id_usuario):
         connection = get_connection()
         if connection is None:
             return False
@@ -46,14 +70,14 @@ class ImportacionOperaciones ():
                      (cantidad_unidades, costo_unitario, nombre_articulo, 
                       codigo_articulo, nombre_proveedor, costo_envio, valor_dolar, 
                       costo_pedido_clp, valor_cif_clp, tasa_importacion_clp, valor_iva_clp, 
-                      total_impuestos_clp, costo_total_clp, costo_total_dolares, fecha, usuario) 
-                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s )"""
+                      total_impuestos_clp, costo_total_clp, costo_total_dolares, fecha, usuario, id_usuario) 
+                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s )"""
             
             valores = (importacion.cantidad_unidades, importacion.costo_unitario,
                       importacion.nombre_articulo, importacion.codigo_articulo,
                       importacion.nombre_proveedor, importacion.costo_envio, 
                       importacion.valor_dolar, importacion.costo_pedido_clp, importacion.valor_cif_clp,
-                      importacion.tasa_importacion_clp, importacion.valor_iva_clp,importacion.total_impuestos_clp, importacion.costo_total_clp, importacion.costo_total_dolares, importacion.fecha, usuario['username'])
+                      importacion.tasa_importacion_clp, importacion.valor_iva_clp,importacion.total_impuestos_clp, importacion.costo_total_clp, importacion.costo_total_dolares, importacion.fecha, usuario['username'], id_usuario)
             
             cursor.execute(sql, valores)
             connection.commit()

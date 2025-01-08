@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from operaciones.importacion_operaciones import ImportacionOperaciones
 from operaciones.usuario_operaciones import UsuarioOperaciones, disponibilidad_usuario
+from operaciones.importacion_operaciones import ImportacionOperaciones
 from modelos.importacion import Importacion       
 from modelos.usuarios import Usuario
 from conexion_bd import get_connection
@@ -26,7 +27,7 @@ def menu_inicio():
             if token:
                 menu_usuario(usuario)
             else:
-                print("Autenticación fallida, intenta de nuevo.")
+                print("Autenticación fallida, intentar de nuevo.")
         elif opcion == "3":
             print("Gracias por usar el sistema.")
             break
@@ -46,9 +47,9 @@ def menu_usuario(usuario):
         opcion = input("\nSeleccionar una opción: ")
         
         if opcion == "1":
-            crear_simulacion(usuario)  # Función para realizar una importación
+            crear_simulacion(usuario)  # Método para realizar calcular los costos de una importacion
         if opcion == "2":
-            listar_importaciones()  # Función para ver el historial de importaciones
+            listar_importaciones()  # Método para ver el historial de importaciones
         if opcion == "3":
             listar_usuarios()
         if opcion == "4":
@@ -76,6 +77,7 @@ def login():
 
             usuario = {
                 'username': user ['username'],
+                'id' : user ['id']
             } 
 
             # Generar token JWT
@@ -165,7 +167,7 @@ def crear_simulacion(usuario):
     tasa_importacion_clp = round(ImportacionOperaciones.calcular_tasa_importacion_CLP(valor_cif_clp),2)
     valor_iva_clp = round(ImportacionOperaciones.calcular_iva_CLP(valor_cif_clp),2)
     costo_total_clp = round(valor_cif_clp + tasa_importacion_clp + valor_iva_clp,2)
-    costo_total_dolares = round(costo_total_clp * valor_dolar,2)
+    costo_total_dolares = round(costo_total_clp / valor_dolar,2)
     total_impuestos_clp = round(tasa_importacion_clp + valor_iva_clp,2)
 
     fecha_actual= datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -180,6 +182,8 @@ def crear_simulacion(usuario):
     print(f"Total de Impuestos                           : {total_impuestos_clp}       CLP")
     print(f"Costo total de la compra (CLP)               : {costo_total_clp}       CLP")
     print(f"Costo total de la compra (dólares)           : {costo_total_dolares}      Dólares")
+
+    id_usuario = ImportacionOperaciones.obtener_id_usuario(usuario['username'])
 
     importacion = Importacion (
         cantidad_unidades = cantidad_unidades,
@@ -197,9 +201,10 @@ def crear_simulacion(usuario):
         costo_total_clp = costo_total_clp,
         costo_total_dolares = costo_total_dolares,
         fecha = fecha_actual,
-        usuario = usuario
+        usuario = usuario,
+        id_usuario = id_usuario
 )
-    if ImportacionOperaciones.ingresar_importacion(importacion, usuario):
+    if ImportacionOperaciones.ingresar_importacion(importacion, usuario, id_usuario):
         print("\nCálculo de importación registrado")
     else:
         print("Error al registrar información")
